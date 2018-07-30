@@ -21,8 +21,6 @@ import com.example.priyankam.myapplication.network.RetrofitClientInstance;
 import com.example.priyankam.myapplication.presenter.MainActivityPresenter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import retrofit2.Call;
@@ -34,7 +32,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
     public MainActivityContract.Presenter mPresenter;
-    String[] values;
     MainAdapter adapter;
 
     @Override
@@ -49,8 +46,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
     public void initView() {
         recyclerView = (RecyclerView) findViewById(R.id.listview);
         progressBar = findViewById(R.id.progress);
-
-
     }
 
     @Override
@@ -67,24 +62,9 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
 
     @Override
     public void setItems(List items) {
-      /*  values = new String[]{"Android List View",
-                "Adapter",
-                "Adapter",
-                "Adapter",
-                "Adapter",
-                "Adapter",
-                "Simple List View In Android",
-                "Create List View Android",
-                "Android Example",
-                "List View Source Code",
-                "List View Array Adapter",
-                "Android Example List View"
-        };
-        items = Arrays.asList(values);*/
         adapter = new MainAdapter(items);
-
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL);
-        recyclerView.addItemDecoration(dividerItemDecoration);
+       // recyclerView.addItemDecoration(dividerItemDecoration);
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adapter);
@@ -131,14 +111,12 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
 
         List<ResultObject> resultObjects =resultArray.getResult();
         Log.d("TAG", "Number of movies received: " + resultObjects.size());
-
         List<String> list= new ArrayList<String>();
         for(int i= 0;i<resultObjects.size();i++){
             Log.d("TAG", "Name: " + resultObjects.get(i).getSiteName());
             list.add(String.valueOf(resultObjects.get(i).getSiteName()));
         }
-
-        setItems(list);
+        setItems(resultObjects);
     }
 
     @Override

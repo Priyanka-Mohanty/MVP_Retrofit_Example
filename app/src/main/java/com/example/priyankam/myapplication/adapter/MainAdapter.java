@@ -8,12 +8,13 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.priyankam.myapplication.R;
+import com.example.priyankam.myapplication.model.ResultObject;
 
 import java.util.List;
 
 public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
 
-    public MainAdapter(List<String> items) {
+    public MainAdapter(List<ResultObject> items) {
         this.items = items;
 
     }
@@ -22,8 +23,8 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
         void onItemClicked(String item);
     }
 
-    private List<String> items;
- //   private Listener listener;
+    private List<ResultObject> items;
+    //   private Listener listener;
 
     @NonNull
     @Override
@@ -35,8 +36,12 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
-        final String item = items.get(position);
-        viewHolder.textName.setText(item);
+        final String itemName = items.get(position).getSiteName();
+        final String itemLoad = items.get(position).getLoadType();
+        final String itemStatus = items.get(position).getStatus();
+        viewHolder.textName.setText(itemName);
+        viewHolder.textLoad.setText(itemLoad);
+        viewHolder.textStatus.setText(itemStatus);
         //holder.textView.setOnClickListener(v -> listener.onItemClicked(item));
     }
 
@@ -49,10 +54,14 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
     static class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView textName;
+        TextView textLoad;
+        TextView textStatus;
 
         ViewHolder(View view) {
             super(view);
             textName = (TextView) itemView.findViewById(R.id.textName);
+            textLoad = (TextView) itemView.findViewById(R.id.textLoad);
+            textStatus = (TextView) itemView.findViewById(R.id.textStatus);
 
         }
     }
