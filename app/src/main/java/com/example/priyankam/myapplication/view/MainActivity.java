@@ -6,6 +6,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -19,7 +20,9 @@ import com.example.priyankam.myapplication.model.ResultObject;
 import com.example.priyankam.myapplication.network.RetrofitClientInstance;
 import com.example.priyankam.myapplication.presenter.MainActivityPresenter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import retrofit2.Call;
@@ -64,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
 
     @Override
     public void setItems(List items) {
-        values = new String[]{"Android List View",
+      /*  values = new String[]{"Android List View",
                 "Adapter",
                 "Adapter",
                 "Adapter",
@@ -77,10 +80,10 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
                 "List View Array Adapter",
                 "Android Example List View"
         };
-        items = Arrays.asList(values);
+        items = Arrays.asList(values);*/
         adapter = new MainAdapter(items);
 
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),DividerItemDecoration.VERTICAL);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL);
         recyclerView.addItemDecoration(dividerItemDecoration);
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -100,7 +103,9 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
                 @Override
                 public void onResponse(Call<ResultArray> call, Response<ResultArray> response) {
                     // progressDoalog.dismiss();
-                    // generateDataList(response.body());
+                    generateDataList(response.body());
+                    List<ResultObject> movies = response.body().getResult();
+                    Log.d("TAG", "Number of movies received: " + movies.size());
                     System.out.println("response = " + response.body().toString());
                 }
 
@@ -108,25 +113,32 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
                 public void onFailure(Call<ResultArray> call, Throwable t) {
                     try {
                         //   progressDoalog.dismiss();
-                        System.out.println("error = "+t.toString());
+                        System.out.println("error = " + t.toString());
                         Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    }
+                }
             });
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     /*Method to generate List of data using RecyclerView with custom adapter*/
-    private void generateDataList(ResultObject photoList) {
-       // recyclerView = findViewById(R.id.customRecyclerView);
-       // adapter = new CustomAdapter(this,photoList);
-       /* RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(MainActivity.this);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(adapter);*/
+    private void generateDataList(ResultArray resultArray) {
+
+
+        List<ResultObject> resultObjects =resultArray.getResult();
+        Log.d("TAG", "Number of movies received: " + resultObjects.size());
+
+        List<String> list= new ArrayList<String>();
+        for(int i= 0;i<resultObjects.size();i++){
+            Log.d("TAG", "Name: " + resultObjects.get(i).getSiteName());
+            list.add(String.valueOf(resultObjects.get(i).getSiteName()));
+        }
+
+        setItems(list);
     }
 
     @Override
