@@ -101,7 +101,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
                 public void onResponse(Call<ResultArray> call, Response<ResultArray> response) {
                     // progressDoalog.dismiss();
                     // generateDataList(response.body());
-
                     System.out.println("response = " + response.body().toString());
                 }
 
