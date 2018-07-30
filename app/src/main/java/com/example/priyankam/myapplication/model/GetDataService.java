@@ -9,6 +9,6 @@ public interface GetDataService {
 
   //  @GET("/photos")
    // @GET("5b5ecac02e00009b0a694666")
-    @GET("5b5ef8fc2e0000e10869475c")
+    @GET("5b5efb0a2e00009c0a69476a")
     Call<ResultArray> getAllData();
 }

@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.example.priyankam.myapplication.R;
 import com.example.priyankam.myapplication.model.ResultObject;
@@ -42,6 +43,12 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
         viewHolder.textName.setText(itemName);
         viewHolder.textLoad.setText(itemLoad);
         viewHolder.textStatus.setText(itemStatus);
+        if(itemStatus.equals("On")){
+            viewHolder.toggleButton.toggle();
+           // viewHolder.toggleButton.setChecked(true);
+        }else{
+            viewHolder.toggleButton.setChecked(false);
+        }
         //holder.textView.setOnClickListener(v -> listener.onItemClicked(item));
     }
 
@@ -56,12 +63,14 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
         TextView textName;
         TextView textLoad;
         TextView textStatus;
+        ToggleButton toggleButton;
 
         ViewHolder(View view) {
             super(view);
             textName = (TextView) itemView.findViewById(R.id.textName);
             textLoad = (TextView) itemView.findViewById(R.id.textLoad);
             textStatus = (TextView) itemView.findViewById(R.id.textStatus);
+            toggleButton = (ToggleButton) itemView.findViewById(R.id.toggleButton);
 
         }
     }
