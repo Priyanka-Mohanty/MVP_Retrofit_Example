@@ -1,9 +1,8 @@
 package com.example.priyankam.myapplication.view;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
@@ -17,16 +16,19 @@ import android.widget.Toast;
 import com.example.priyankam.myapplication.R;
 import com.example.priyankam.myapplication.adapter.MainAdapter;
 import com.example.priyankam.myapplication.contract.MainActivityContract;
+import com.example.priyankam.myapplication.database.MainDatabase;
 import com.example.priyankam.myapplication.model.GetDataService;
 import com.example.priyankam.myapplication.model.ResultArray;
 import com.example.priyankam.myapplication.model.ResultObject;
 import com.example.priyankam.myapplication.network.RetrofitClientInstance;
 import com.example.priyankam.myapplication.presenter.MainActivityPresenter;
+import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -38,13 +40,40 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
     public MainActivityContract.Presenter mPresenter;
     MainAdapter adapter;
     Context context;
+
+    @SuppressLint("CheckResult")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        context=MainActivity.this;
-        fetchData();
+        context = MainActivity.this;
+        // fetchData();
         mPresenter = new MainActivityPresenter(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        try {
+            ReactiveNetwork
+                    .observeNetworkConnectivity(getApplicationContext())
+                    .flatMapSingle(connectivity -> ReactiveNetwork.checkInternetConnectivity())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(isConnected -> {
+                                // isConnected can be true or false
+                                if (isConnected) {
+                                    fetchData();
+                                } else {
+                                    Toast.makeText(context, "not connected", Toast.LENGTH_SHORT).show();
+                                }
+
+
+                            }
+                    );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -67,9 +96,9 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
 
     @Override
     public void setItems(List items) {
-        adapter = new MainAdapter(context,items);
+        adapter = new MainAdapter(context, items);
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL);
-       // recyclerView.addItemDecoration(dividerItemDecoration);
+        // recyclerView.addItemDecoration(dividerItemDecoration);
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adapter);
@@ -79,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
     private void fetchData() {
         try {
             /*Create handle for the RetrofitInstance interface*/
-            GetDataService service = RetrofitClientInstance.getRetrofitInstance().create(GetDataService.class);
+            GetDataService service = RetrofitClientInstance.getRetrofitInstance(context).create(GetDataService.class);
             Call<ResultArray> call = service.getAllData();
 
             call.enqueue(new Callback<ResultArray>() {
@@ -87,9 +116,20 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
                 @Override
                 public void onResponse(Call<ResultArray> call, Response<ResultArray> response) {
                     // progressDoalog.dismiss();
+
+
+                    List<ResultObject> resultObjects = response.body().getResult();
+                    Log.d("TAG", "Number of records: " + resultObjects.size());
+
+                    MainDatabase mainDatabase = new MainDatabase(context);
+                    mainDatabase.open();
+                    mainDatabase.deleteMasterTable();
+                    mainDatabase.insertMasterTable(resultObjects);
+                    mainDatabase.getMaster();
+                    mainDatabase.close();
+
                     generateDataList(response.body());
-                    List<ResultObject> movies = response.body().getResult();
-                    Log.d("TAG", "Number of movies received: " + movies.size());
+
                     System.out.println("response = " + response.body().toString());
                 }
 
@@ -113,10 +153,10 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
     private void generateDataList(ResultArray resultArray) {
 
 
-        List<ResultObject> resultObjects =resultArray.getResult();
-        Log.d("TAG", "Number of movies received: " + resultObjects.size());
-        List<String> list= new ArrayList<String>();
-        for(int i= 0;i<resultObjects.size();i++){
+        List<ResultObject> resultObjects = resultArray.getResult();
+        Log.d("TAG", "Number of records: " + resultObjects.size());
+        List<String> list = new ArrayList<String>();
+        for (int i = 0; i < resultObjects.size(); i++) {
             Log.d("TAG", "Name: " + resultObjects.get(i).getSiteName());
             list.add(String.valueOf(resultObjects.get(i).getSiteName()));
         }
