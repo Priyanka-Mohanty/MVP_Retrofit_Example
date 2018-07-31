@@ -1,6 +1,9 @@
 package com.example.priyankam.myapplication.view;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
@@ -20,6 +23,7 @@ import com.example.priyankam.myapplication.model.ResultObject;
 import com.example.priyankam.myapplication.network.RetrofitClientInstance;
 import com.example.priyankam.myapplication.presenter.MainActivityPresenter;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,11 +37,12 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
     private ProgressBar progressBar;
     public MainActivityContract.Presenter mPresenter;
     MainAdapter adapter;
-
+    Context context;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        context=MainActivity.this;
         fetchData();
         mPresenter = new MainActivityPresenter(this);
     }
@@ -62,13 +67,12 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
 
     @Override
     public void setItems(List items) {
-        adapter = new MainAdapter(items);
+        adapter = new MainAdapter(context,items);
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL);
        // recyclerView.addItemDecoration(dividerItemDecoration);
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adapter);
-
 
     }
 

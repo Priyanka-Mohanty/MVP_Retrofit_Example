@@ -1,5 +1,8 @@
 package com.example.priyankam.myapplication.adapter;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -15,17 +18,14 @@ import java.util.List;
 
 public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
 
-    public MainAdapter(List<ResultObject> items) {
-        this.items = items;
-
-    }
-
-    interface Listener {
-        void onItemClicked(String item);
-    }
-
     private List<ResultObject> items;
-    //   private Listener listener;
+    private Context context;
+    Boolean checkState;
+
+    public MainAdapter(Context context, List<ResultObject> items) {
+        this.items = items;
+        this.context = context;
+    }
 
     @NonNull
     @Override
@@ -43,15 +43,96 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
         viewHolder.textName.setText(itemName);
         viewHolder.textLoad.setText(itemLoad);
         viewHolder.textStatus.setText(itemStatus);
-        if(itemStatus.equals("On")){
+        if (itemStatus.equals("On")) {
             viewHolder.toggleButton.toggle();
-           // viewHolder.toggleButton.setChecked(true);
-        }else{
+            checkState = true;
+            // viewHolder.toggleButton.setChecked(true);
+        } else {
             viewHolder.toggleButton.setChecked(false);
+            checkState = false;
         }
-        //holder.textView.setOnClickListener(v -> listener.onItemClicked(item));
+
+        viewHolder.toggleButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                callCheck(viewHolder.toggleButton);
+            }
+        });
+
     }
 
+    private void callCheck(ToggleButton toggleButton) {
+        if (checkState) {
+
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                    context);
+
+            alertDialogBuilder
+                    .setMessage(
+                            "Sure you want to enable?. ")
+                    .setCancelable(false)
+                    .setPositiveButton(
+                            "YES",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog,
+                                                    int which) {
+
+                                    dialog.cancel();
+                                }
+                            })
+
+                    .setNegativeButton(
+                            "NO",
+                            new DialogInterface.OnClickListener() {
+
+                                @Override
+                                public void onClick(DialogInterface dialog,
+                                                    int which) {
+
+                                    dialog.cancel();
+                                    checkState = true;
+                                    toggleButton.toggle();
+                                }
+                            });
+
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+        } else {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                    context);
+            alertDialogBuilder
+                    .setMessage(
+                            "Sure you want to disable?")
+                    .setCancelable(true)
+                    .setPositiveButton(
+                            "YES",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog,
+                                                    int which) {
+                                    dialog.cancel();
+                                }
+                            })
+
+                    .setNegativeButton(
+                            "NO",
+                            new DialogInterface.OnClickListener() {
+
+                                @Override
+                                public void onClick(DialogInterface dialog,
+                                                    int which) {
+
+                                    dialog.cancel();
+                                    checkState = true;
+                                    toggleButton.toggle();
+                                }
+                            });
+
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+        }
+    }
 
     @Override
     public int getItemCount() {

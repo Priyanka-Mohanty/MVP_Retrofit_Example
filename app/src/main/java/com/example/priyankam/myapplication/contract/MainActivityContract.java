@@ -25,7 +25,8 @@ public interface MainActivityContract {
     }
 
     interface Presenter {
-
     }
+
+
 }
 
