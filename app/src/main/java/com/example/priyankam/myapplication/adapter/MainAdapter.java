@@ -13,23 +13,22 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.example.priyankam.myapplication.R;
+import com.example.priyankam.myapplication.database.MainDatabase;
 import com.example.priyankam.myapplication.model.GetDataService;
 import com.example.priyankam.myapplication.model.ResultObject;
 import com.example.priyankam.myapplication.model.ResultStatusPost;
-import com.example.priyankam.myapplication.network.RetrofitClientInstanceGet;
 import com.example.priyankam.myapplication.network.RetrofitClientInstancePost;
-import com.google.gson.JsonObject;
+import com.example.priyankam.myapplication.view.MainActivity;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.List;
 
-import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.http.POST;
 
 import static android.content.ContentValues.TAG;
 
@@ -59,34 +58,42 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
         final String itemStatus = items.get(position).getStatus();
         viewHolder.textName.setText(itemName);
         viewHolder.textLoad.setText(itemLoad);
-        viewHolder.textStatus.setText(itemStatus);
+        // viewHolder.textStatus.setText(itemStatus);
         if (itemStatus.equals("On")) {
-            viewHolder.toggleButton.toggle();
-            checkState = true;
+            viewHolder.toggleButton.setChecked(true);
             // viewHolder.toggleButton.setChecked(true);
         } else {
             viewHolder.toggleButton.setChecked(false);
-            checkState = false;
         }
-
+        viewHolder.textStatus.setText("");
         viewHolder.toggleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                callCheck(viewHolder.toggleButton);
+                if (items.get(position).getStatus().equals("On")) {
+                    viewHolder.toggleButton.setChecked(true);
+                    checkState = true;
+
+                } else {
+                    viewHolder.toggleButton.setChecked(false);
+                    checkState = false;
+                }
+                String siteID = items.get(position).getSiteID();
+
+
+                callCheck(viewHolder.toggleButton, viewHolder.textStatus, siteID);
             }
         });
 
     }
 
-    private void callCheck(ToggleButton toggleButton) {
-        if (checkState) {
+    private void callCheck(ToggleButton toggleButton, TextView textStatus, String siteID) {
+        if (!checkState) {
 
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                     context);
 
             alertDialogBuilder
-                    .setMessage(
-                            "Sure you want to enable?. ")
+                    .setMessage("Sure you want to enable?")
                     .setCancelable(false)
                     .setPositiveButton(
                             "YES",
@@ -94,8 +101,12 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
                                 @Override
                                 public void onClick(DialogInterface dialog,
                                                     int which) {
-                                    sendPost();
+                                    checkState = false;
+                                    toggleButton.setChecked(false);
+                                    textStatus.setText("Request Pending");
+                                    sendPost(toggleButton, textStatus, siteID, checkState);
                                     dialog.cancel();
+
                                 }
                             })
 
@@ -106,10 +117,9 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
                                 @Override
                                 public void onClick(DialogInterface dialog,
                                                     int which) {
-
                                     dialog.cancel();
-                                    checkState = true;
-                                    toggleButton.toggle();
+                                    checkState = false;
+                                    toggleButton.setChecked(false);
                                 }
                             });
 
@@ -128,7 +138,10 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
                                 @Override
                                 public void onClick(DialogInterface dialog,
                                                     int which) {
-                                    sendPost();
+                                    toggleButton.setChecked(true);
+                                    textStatus.setText("Request Pending");
+                                    sendPost(toggleButton, textStatus, siteID, checkState);
+                                    checkState = true;
                                     dialog.cancel();
                                 }
                             })
@@ -143,7 +156,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
 
                                     dialog.cancel();
                                     checkState = true;
-                                    toggleButton.toggle();
+                                    toggleButton.setChecked(true);
                                 }
                             });
 
@@ -152,14 +165,19 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
         }
     }
 
-    private void sendPost() {
+    private void sendPost(ToggleButton toggleButton, TextView textStatus, String siteID, Boolean Status) {
         //String Url = "https://ptsv2.com/t/5q9xm-1533097794/post";
-       // String Url = "http://10.1.1.206/Projects/php_upload/techMPost.php";
+        // String Url = "http://10.1.1.206/Projects/php_upload/techMPost.php";
         GetDataService service = RetrofitClientInstancePost.getRetrofitInstance(context).create(GetDataService.class);
-
+        String status;
+        if (Status == true) {
+            status = "On";
+        } else {
+            status = "Off";
+        }
         HashMap<String, String> map = new HashMap<>();
-        map.put("siteID", "123");
-        map.put("status", "dsds");
+        map.put("siteID", siteID);
+        map.put("status", status);
 
 
         JSONObject jsonObject = new JSONObject(map);
@@ -172,7 +190,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
             public void onResponse(Call<ResultStatusPost> call, Response<ResultStatusPost> response) {
                 Log.d("URL", "URL = " + call.request().url().toString()); // here
                 if (response.isSuccessful()) {
-                   // showResponse(response.body().toString());
+                    showResponse(toggleButton, textStatus, response.body().toString());
                     Log.i(TAG, "post submitted to API." + response.body().toString());
                 }
             }
@@ -185,9 +203,42 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
         });
     }
 
-    public void showResponse(String response) {
+    public void showResponse(ToggleButton toggleButton, TextView textStatus, String response) {
         Log.d(response, response);
+        try {
+            JSONObject jsonObject = new JSONObject(response);
+            String siteID = jsonObject.getString("siteId"); // get the name from data.
+            String status = jsonObject.getString("status"); // get the name from data.
+            ResultStatusPost resultStatusPost = new ResultStatusPost(siteID, status);
+            Log.d("response", resultStatusPost.getSiteID().toString());
+            if (resultStatusPost.getStatus().equals("On")) {
+                toggleButton.setChecked(true);
+                checkState = true;
+            } else {
+                toggleButton.setChecked(false);
+                checkState = false;
+            }
+            textStatus.setText("");
+
+            updateStatusInDataBase(siteID, status);
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
+
+    private void updateStatusInDataBase(String siteID, String status) {
+        MainDatabase mainDatabase = new MainDatabase(context);
+        mainDatabase.open();
+        mainDatabase.updateStatusInMasterTable(siteID, status);
+        mainDatabase.close();
+
+        MainActivity mainActivity = (MainActivity) context;
+        mainActivity.getDataFromDatabase();
+
+    }
+
 
     @Override
     public int getItemCount() {

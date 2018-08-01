@@ -11,6 +11,12 @@ public class ResultStatusPost {
     @Expose
     private String status;
 
+    public ResultStatusPost(String SiteID, String Status) {
+        this.siteID = SiteID;
+        this.status = Status;
+    }
+
+
     public String getSiteID() {
         return siteID;
     }
@@ -26,6 +32,7 @@ public class ResultStatusPost {
     public void setStatus(String status) {
         this.status = status;
     }
+
     @Override
     public String toString() {
         return "{" +

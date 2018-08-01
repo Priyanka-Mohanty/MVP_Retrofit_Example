@@ -32,13 +32,13 @@ public class MainDatabase {
     public static final String SITE_NAME = "siteName";
     public static final String EQUIPMENT_ID = "equipmentID";
     public static final String EQUIPMENT_TYPE = "equipmentType";
+    public static final String URL = "url";
     public static final String PORT = "port";
     public static final String API_KEY = "apiKey";
     public static final String UUID = "uuID";
     public static final String LOAD_TYPE = "loadType";
     public static final String PIN_NUMBER = "pinNumber";
     public static final String STATUS = "status";
-    public static final String SYNC_FLAG = "syncFlag";
 
 
     protected int oldVersion = 0;
@@ -124,6 +124,7 @@ public class MainDatabase {
                 cv.put(SITE_NAME, resultObjects.get(i).getSiteName());
                 cv.put(EQUIPMENT_ID, resultObjects.get(i).getEquipmentID());
                 cv.put(EQUIPMENT_TYPE, resultObjects.get(i).getEquipmentType());
+                cv.put(URL, resultObjects.get(i).getUrl());
                 cv.put(PORT, resultObjects.get(i).getPort());
                 cv.put(API_KEY, resultObjects.get(i).getApiKey());
                 cv.put(UUID, resultObjects.get(i).getUuid());
@@ -146,7 +147,7 @@ public class MainDatabase {
     }
 
     public void insertMasterTable(String siteID, String siteName,
-                                  String equipmentID, String equipmentType,
+                                  String equipmentID, String equipmentType, String Url,
                                   String port, String apiKey,
                                   String uuid, String loadType,
                                   String pinNumber, String status) {
@@ -157,6 +158,7 @@ public class MainDatabase {
             cv.put(SITE_NAME, siteName);
             cv.put(EQUIPMENT_ID, equipmentID);
             cv.put(EQUIPMENT_TYPE, equipmentType);
+            cv.put(URL, Url);
             cv.put(PORT, port);
             cv.put(API_KEY, apiKey);
             cv.put(UUID, uuid);
@@ -195,6 +197,7 @@ public class MainDatabase {
         }
         return c;
     }
+
     public String getStatusData(String status) {
         String StatusData = "";
         try {
@@ -239,21 +242,19 @@ public class MainDatabase {
         }
     }
 
-    public int updateSyncFlagMasterTable(String syncFlag, int syncDataStatus) {
+
+    public int updateStatusInMasterTable(String siteID, String status) {
 
         int isUpdated = 0;
         try {
             ContentValues cv = new ContentValues();
-            cv.put(mainDataBase.SYNC_FLAG, syncDataStatus);
-            isUpdated = sdbWfm.update(mainDataBase.TABLE_MASTER, cv, mainDataBase.SYNC_FLAG + " = '" + syncFlag + "'", null);
-
+            cv.put(mainDataBase.STATUS, status);
+            isUpdated = sdbWfm.update(mainDataBase.TABLE_MASTER, cv, mainDataBase.SITE_ID + " = '" + siteID + "'", null);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return isUpdated;
     }
-
-
 
 
     /*-------------------------------------------------------------------------------------------*/
@@ -274,11 +275,10 @@ public class MainDatabase {
                         _ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                         SITE_ID + " TEXT," + // Define a  key
                         SITE_NAME + " TEXT," + EQUIPMENT_ID + " TEXT," + EQUIPMENT_TYPE + " TEXT," +
-                        PORT + " TEXT," + API_KEY + " TEXT," +
+                        URL + " TEXT," + PORT + " TEXT," + API_KEY + " TEXT," +
                         UUID + " TEXT," + LOAD_TYPE + " TEXT," +
                         PIN_NUMBER + " TEXT," +
-                        STATUS + " TEXT," +
-                        SYNC_FLAG + " TEXT" +
+                        STATUS + " TEXT" +
                         ");";
 
                 db.execSQL(createMasterTable);

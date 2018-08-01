@@ -17,6 +17,9 @@ public class ResultObject {
     @SerializedName("equipmentType")
     @Expose
     private String equipmentType;
+    @SerializedName("url")
+    @Expose
+    private String url;
     @SerializedName("port")
     @Expose
     private String port;
@@ -77,6 +80,13 @@ public class ResultObject {
     public void setEquipmentType(String equipmentType) {
         this.equipmentType = equipmentType;
     }
+
+    public String getUrl() { return url;}
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
 
     public String getPort() {
         return port;

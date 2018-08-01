@@ -19,7 +19,8 @@ public interface GetDataService {
 
     // Request method and URL specified in the annotation
     // Callback for the parsed response is the last parameter
-    @GET("5b5efb0a2e00009c0a69476a")
+    //@GET("5b5efb0a2e00009c0a69476a")
+    @GET("5b61a89a300000f10d6a4285")
     Call<ResultArray> getAllData();
 
 

@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">MVP Retrofit</string>
+    <string name="app_name">TechM mtoc</string>
+    <string name="log_data_not_available">Data not available</string>
 </resources>
