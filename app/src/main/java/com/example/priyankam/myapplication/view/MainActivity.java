@@ -20,7 +20,7 @@ import com.example.priyankam.myapplication.database.MainDatabase;
 import com.example.priyankam.myapplication.model.GetDataService;
 import com.example.priyankam.myapplication.model.ResultArray;
 import com.example.priyankam.myapplication.model.ResultObject;
-import com.example.priyankam.myapplication.network.RetrofitClientInstance;
+import com.example.priyankam.myapplication.network.RetrofitClientInstanceGet;
 import com.example.priyankam.myapplication.presenter.MainActivityPresenter;
 import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork;
 
@@ -47,13 +47,8 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         context = MainActivity.this;
-        // fetchData();
         mPresenter = new MainActivityPresenter(this);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
+        // fetchData();
         try {
             ReactiveNetwork
                     .observeNetworkConnectivity(getApplicationContext())
@@ -74,6 +69,13 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
     }
 
     @Override
@@ -108,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
     private void fetchData() {
         try {
             /*Create handle for the RetrofitInstance interface*/
-            GetDataService service = RetrofitClientInstance.getRetrofitInstance(context).create(GetDataService.class);
+            GetDataService service = RetrofitClientInstanceGet.getRetrofitInstance(context).create(GetDataService.class);
             Call<ResultArray> call = service.getAllData();
 
             call.enqueue(new Callback<ResultArray>() {

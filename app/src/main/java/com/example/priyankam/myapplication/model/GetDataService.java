@@ -1,22 +1,28 @@
 package com.example.priyankam.myapplication.model;
 
 
+import org.json.JSONObject;
+
+import java.util.Map;
+
+import okhttp3.Callback;
+import okhttp3.RequestBody;
 import retrofit2.Call;
+import retrofit2.http.Body;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
-import io.reactivex.Observable;
-import retrofit2.http.GET;
-import retrofit2.http.Path;
+import retrofit2.http.POST;
+import retrofit2.http.PartMap;
 
 public interface GetDataService {
-
-    //  @GET("/photos")
-    // @GET("5b5ecac02e00009b0a694666")
-   /* @GET("5b5efb0a2e00009c0a69476a")
-    Call<ResultArray> getAllData();*/
 
     // Request method and URL specified in the annotation
     // Callback for the parsed response is the last parameter
     @GET("5b5efb0a2e00009c0a69476a")
-    //Observable<ResultArray> getAllData();
     Call<ResultArray> getAllData();
+
+
+    @POST("techMPost.php")
+    Call<ResultStatusPost> savePost(@Body String body);
 }

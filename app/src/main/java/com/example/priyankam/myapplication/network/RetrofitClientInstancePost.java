@@ -11,11 +11,12 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class RetrofitClientInstance {
+public class RetrofitClientInstancePost {
     private static Retrofit retrofit;
     //private static final String BASE_URL = "https://jsonplaceholder.typicode.com";
     //private static final String BASE_URL = "http://www.mocky.io/v2/5b5ebe412e00009b0a69461b";
-    private static final String BASE_URL = "http://www.mocky.io/v2/";
+    //private static final String BASE_URL = "http://www.mocky.io/v2/";
+    private static final String BASE_URL = "http://10.1.1.206/Projects/php_upload/";
 
     private static int REQUEST_TIMEOUT = 60;
     /**
@@ -34,8 +35,9 @@ public class RetrofitClientInstance {
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
         okHttpClient = new OkHttpClient.Builder().addInterceptor(interceptor).build();
         RxJava2CallAdapterFactory rxAdapter = RxJava2CallAdapterFactory.create();
+
         if (retrofit == null) {
-            retrofit = new retrofit2.Retrofit.Builder()
+            retrofit = new Retrofit.Builder()
                     .baseUrl(BASE_URL)
                     .addConverterFactory(GsonConverterFactory.create(gson))
                     .client(okHttpClient)

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,9 +13,25 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.example.priyankam.myapplication.R;
+import com.example.priyankam.myapplication.model.GetDataService;
 import com.example.priyankam.myapplication.model.ResultObject;
+import com.example.priyankam.myapplication.model.ResultStatusPost;
+import com.example.priyankam.myapplication.network.RetrofitClientInstanceGet;
+import com.example.priyankam.myapplication.network.RetrofitClientInstancePost;
+import com.google.gson.JsonObject;
 
+import org.json.JSONObject;
+
+import java.util.HashMap;
 import java.util.List;
+
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.http.POST;
+
+import static android.content.ContentValues.TAG;
 
 public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
 
@@ -77,7 +94,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
                                 @Override
                                 public void onClick(DialogInterface dialog,
                                                     int which) {
-
+                                    sendPost();
                                     dialog.cancel();
                                 }
                             })
@@ -111,6 +128,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
                                 @Override
                                 public void onClick(DialogInterface dialog,
                                                     int which) {
+                                    sendPost();
                                     dialog.cancel();
                                 }
                             })
@@ -132,6 +150,43 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
             AlertDialog alertDialog = alertDialogBuilder.create();
             alertDialog.show();
         }
+    }
+
+    private void sendPost() {
+        //String Url = "https://ptsv2.com/t/5q9xm-1533097794/post";
+       // String Url = "http://10.1.1.206/Projects/php_upload/techMPost.php";
+        GetDataService service = RetrofitClientInstancePost.getRetrofitInstance(context).create(GetDataService.class);
+
+        HashMap<String, String> map = new HashMap<>();
+        map.put("siteID", "123");
+        map.put("status", "dsds");
+
+
+        JSONObject jsonObject = new JSONObject(map);
+        System.out.println("jsonObject=" + jsonObject);
+
+        Call<ResultStatusPost> call = service.savePost(jsonObject.toString());
+
+        call.enqueue(new Callback<ResultStatusPost>() {
+            @Override
+            public void onResponse(Call<ResultStatusPost> call, Response<ResultStatusPost> response) {
+                Log.d("URL", "URL = " + call.request().url().toString()); // here
+                if (response.isSuccessful()) {
+                   // showResponse(response.body().toString());
+                    Log.i(TAG, "post submitted to API." + response.body().toString());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResultStatusPost> call, Throwable t) {
+                Log.d("URL", "URL = " + call.request().url().toString()); // here
+                Log.e(TAG, "Unable to submit post to API.");
+            }
+        });
+    }
+
+    public void showResponse(String response) {
+        Log.d(response, response);
     }
 
     @Override
