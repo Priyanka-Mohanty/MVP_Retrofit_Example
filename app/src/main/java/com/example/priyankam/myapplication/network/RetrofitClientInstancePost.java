@@ -2,6 +2,7 @@ package com.example.priyankam.myapplication.network;
 
 import android.content.Context;
 
+import com.example.priyankam.myapplication.model.GetDataService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -29,7 +30,7 @@ public class RetrofitClientInstancePost {
             .create();
     static OkHttpClient okHttpClient;
 
-    public static Retrofit getRetrofitInstance(Context context) {
+    public static Retrofit getRetrofitInstance(String url) {
 
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -38,13 +39,23 @@ public class RetrofitClientInstancePost {
 
         if (retrofit == null) {
             retrofit = new Retrofit.Builder()
-                    .baseUrl(BASE_URL)
+                    .baseUrl(url)
                     .addConverterFactory(GsonConverterFactory.create(gson))
                     .client(okHttpClient)
                     .addCallAdapterFactory(rxAdapter)
                     .build();
         }
         return retrofit;
+    }
+
+    public static GetDataService getApiService(String url) {
+        try {
+            return getRetrofitInstance(url).create(GetDataService.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
     }
 
 }

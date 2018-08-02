@@ -23,6 +23,7 @@ import com.example.priyankam.myapplication.model.ResultArray;
 import com.example.priyankam.myapplication.model.ResultObject;
 import com.example.priyankam.myapplication.network.RetrofitClientInstanceGet;
 import com.example.priyankam.myapplication.presenter.MainActivityPresenter;
+import com.example.priyankam.myapplication.utils.ConstantValues;
 import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork;
 
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
     public MainActivityContract.Presenter mPresenter;
-    public  MainAdapter adapter;
+    public MainAdapter adapter;
     Context context;
 
     int getColumnSiteID;
@@ -194,8 +195,13 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
     private void fetchData() {
         try {
             /*Create handle for the RetrofitInstance interface*/
-            GetDataService service = RetrofitClientInstanceGet.getRetrofitInstance(context).create(GetDataService.class);
-            Call<ResultArray> call = service.getAllData();
+            // GetDataService service = RetrofitClientInstanceGet.getRetrofitInstance(context).create(GetDataService.class);
+            //String url="http://www.mocky.io/v2/5b61a89a300000f10d6a4285";
+            ConstantValues constantValues = new ConstantValues();
+            String parentUrl = constantValues.getParentUrl;
+            String url = constantValues.getUrl;
+            GetDataService service = RetrofitClientInstanceGet.getApiService(parentUrl);
+            Call<ResultArray> call = service.getAllData(url);
 
             call.enqueue(new Callback<ResultArray>() {
 

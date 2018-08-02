@@ -2,6 +2,7 @@ package com.example.priyankam.myapplication.network;
 
 import android.content.Context;
 
+import com.example.priyankam.myapplication.model.GetDataService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -10,6 +11,7 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.Url;
 
 public class RetrofitClientInstanceGet {
     private static Retrofit retrofit;
@@ -28,7 +30,7 @@ public class RetrofitClientInstanceGet {
             .create();
     static OkHttpClient okHttpClient;
 
-    public static Retrofit getRetrofitInstance(Context context) {
+    public static Retrofit getRetrofitInstance(String url) {
 
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -36,13 +38,22 @@ public class RetrofitClientInstanceGet {
         RxJava2CallAdapterFactory rxAdapter = RxJava2CallAdapterFactory.create();
         if (retrofit == null) {
             retrofit = new retrofit2.Retrofit.Builder()
-                    .baseUrl(BASE_URL)
+                    .baseUrl(url)
                     .addConverterFactory(GsonConverterFactory.create(gson))
                     .client(okHttpClient)
                     .addCallAdapterFactory(rxAdapter)
                     .build();
         }
         return retrofit;
+    }
+    public static GetDataService getApiService(String url) {
+        try {
+            return getRetrofitInstance(url).create(GetDataService.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
     }
 
 }

@@ -17,7 +17,9 @@ import com.example.priyankam.myapplication.database.MainDatabase;
 import com.example.priyankam.myapplication.model.GetDataService;
 import com.example.priyankam.myapplication.model.ResultObject;
 import com.example.priyankam.myapplication.model.ResultStatusPost;
+import com.example.priyankam.myapplication.network.RetrofitClientInstanceGet;
 import com.example.priyankam.myapplication.network.RetrofitClientInstancePost;
+import com.example.priyankam.myapplication.utils.ConstantValues;
 import com.example.priyankam.myapplication.view.MainActivity;
 
 import org.json.JSONException;
@@ -69,7 +71,10 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
         viewHolder.toggleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                String url = items.get(position).getUrl().toString();
                 if (items.get(position).getStatus().equals("On")) {
+
                     viewHolder.toggleButton.setChecked(true);
                     checkState = true;
 
@@ -80,13 +85,13 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
                 String siteID = items.get(position).getSiteID();
 
 
-                callCheck(viewHolder.toggleButton, viewHolder.textStatus, siteID);
+                callCheck(viewHolder.toggleButton, viewHolder.textStatus, url, siteID);
             }
         });
 
     }
 
-    private void callCheck(ToggleButton toggleButton, TextView textStatus, String siteID) {
+    private void callCheck(ToggleButton toggleButton, TextView textStatus, String url, String siteID) {
         if (!checkState) {
 
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
@@ -104,7 +109,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
                                     checkState = false;
                                     toggleButton.setChecked(false);
                                     textStatus.setText("Request Pending");
-                                    sendPost(toggleButton, textStatus, siteID, checkState);
+                                    sendPost(toggleButton, textStatus, url, siteID, checkState);
                                     dialog.cancel();
 
                                 }
@@ -140,7 +145,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
                                                     int which) {
                                     toggleButton.setChecked(true);
                                     textStatus.setText("Request Pending");
-                                    sendPost(toggleButton, textStatus, siteID, checkState);
+                                    sendPost(toggleButton, textStatus, url, siteID, checkState);
                                     checkState = true;
                                     dialog.cancel();
                                 }
@@ -165,10 +170,9 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
         }
     }
 
-    private void sendPost(ToggleButton toggleButton, TextView textStatus, String siteID, Boolean Status) {
+    private void sendPost(ToggleButton toggleButton, TextView textStatus, String url, String siteID, Boolean Status) {
         //String Url = "https://ptsv2.com/t/5q9xm-1533097794/post";
         // String Url = "http://10.1.1.206/Projects/php_upload/techMPost.php";
-        GetDataService service = RetrofitClientInstancePost.getRetrofitInstance(context).create(GetDataService.class);
         String status;
         if (Status == true) {
             status = "On";
@@ -176,14 +180,20 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
             status = "Off";
         }
         HashMap<String, String> map = new HashMap<>();
-        map.put("siteID", siteID);
-        map.put("status", status);
+        map.put("uuid", siteID);
+        map.put("app_key", status);
 
 
         JSONObject jsonObject = new JSONObject(map);
         System.out.println("jsonObject=" + jsonObject);
 
-        Call<ResultStatusPost> call = service.savePost(jsonObject.toString());
+        ConstantValues constantValues = new ConstantValues();
+        String parentUrl = constantValues.postParentUrl;
+        url = constantValues.postUrl;
+        //GetDataService service = RetrofitClientInstancePost.getRetrofitInstance(context).create(GetDataService.class);
+        GetDataService service = RetrofitClientInstancePost.getApiService(parentUrl);
+
+        Call<ResultStatusPost> call = service.savePost(url, jsonObject.toString());
 
         call.enqueue(new Callback<ResultStatusPost>() {
             @Override
